@@ -861,7 +861,7 @@
 
   // ---------- Telegram + leaderboard ----------
   // The game is a static page; scores reach the bot through Telegram itself.
-  //  MODE 'tgkb'  opened from the bot's "🎮 Oyna" keyboard button (its URL has kb=1):
+  //  MODE 'tgkb'  opened from the bot's "🎮 Oyna" keyboard button (its URL has kb=1&b=2):
   //               "Skoru Gönder" calls Telegram.WebApp.sendData(); Telegram closes the
   //               game, and the bot records the score and replies with the top 10.
   //  MODE 'tg'    opened inside Telegram some other way (sendData is not available):
@@ -872,8 +872,10 @@
   const TG = (window.Telegram && Telegram.WebApp && Telegram.WebApp.platform &&
               Telegram.WebApp.platform !== 'unknown') ? Telegram.WebApp : null;
   const QS = new URLSearchParams(location.search);
-  const MODE = TG ? (QS.get('kb') === '1' ? 'tgkb' : 'tg') : 'local';
-  const BOT_LINK = 'https://t.me/MaviBonus_Bot?start=oyun';
+  // b=2 marks buttons from the game bot (@MaviOyunBot). Older buttons (b missing) came from
+  // the promo bot, which no longer takes scores: treat them like 'tg' and point to the game bot.
+  const MODE = TG ? (QS.get('kb') === '1' && QS.get('b') === '2' ? 'tgkb' : 'tg') : 'local';
+  const BOT_LINK = 'https://t.me/MaviOyunBot?start=oyun';
   const LB_SIZE = 10, NAME_MAX = 14, LOCAL_KEY = 'mk_top10';
 
   if (TG) {
@@ -996,8 +998,8 @@
         setButtons(`📨 Skoru Gönder (${sessionBest})`);
         setStatus('Gönderince oyun kapanır, sıralaman sohbete gelir.', 'note');
       } else if (MODE === 'tg') {
-        setButtons('💬 Skor için botu aç');
-        setStatus('Skorun listeye girmesi için oyunu botun sohbetindeki 🎮 butonundan aç.', 'note');
+        setButtons('🎮 @MaviOyunBot’u aç');
+        setStatus('Skorlar @MaviOyunBot’ta kaydediliyor. Oradaki 🎮 butonundan oyna, listeye gir!', 'note');
       }
     }
     ui.hidden = false;
